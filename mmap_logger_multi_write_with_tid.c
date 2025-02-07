@@ -12,6 +12,9 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 // 函数指针声明
 static void* (*original_malloc)(size_t) = NULL;
@@ -33,6 +36,12 @@ static void (*original_bcopy)(const void*, void*, size_t) = NULL;
 // 定义最大日志长度
 #define MAX_LOG_LENGTH 1024
 
+// 定义结构体
+typedef struct {
+    pid_t pid;
+    void* virtual_addr;
+} RequestData;
+
 // 获取当前时间（单位：纳秒）
 long get_current_time_ns() {
     struct timespec ts;
@@ -40,34 +49,45 @@ long get_current_time_ns() {
     return ts.tv_sec * 1000000000L + ts.tv_nsec;
 }
 
+
 // 获取当前线程的 TID
 pid_t get_thread_tid() {
     return syscall(SYS_gettid); // 获取当前线程的TID
 }
 
-// 查询物理地址
-unsigned long get_physical_address(const void *virtual_address, pid_t pid) {
-    unsigned long page_size = sysconf(_SC_PAGE_SIZE);
-    unsigned long page_offset = (unsigned long)virtual_address % page_size;
-    unsigned long page_number = (unsigned long)virtual_address / page_size;
+// 连接到服务器并获取物理地址
+uint64_t get_physical_address(pid_t pid, void* virtual_addr) {
 
-    char pagemap_file[256];
-    snprintf(pagemap_file, sizeof(pagemap_file), "/proc/%d/pagemap", pid);
-    
-    FILE *pagemap = fopen(pagemap_file, "rb");
-    if (!pagemap) {
-        perror("Failed to open pagemap");
+    int client_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_fd == -1) {
+        perror("socket failed");
         return 0;
     }
 
-    unsigned long entry;
-    fseek(pagemap, page_number * sizeof(entry), SEEK_SET);
-    fread(&entry, sizeof(entry), 1, pagemap);
-    fclose(pagemap);
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // 服务器地址
+    server_addr.sin_port = htons(12345); // 服务器端口
 
-    // 提取物理页号
-    unsigned long physical_page = entry & ((1UL << 54) - 1); // 物理页号在高54位
-    return physical_page * page_size + page_offset;
+    if (connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+        perror("connect failed");
+        return 0;
+    }
+
+    // 将虚拟地址转换为 uintptr_t 类型以传递
+    fprintf(stderr, "Sending request: PID = %d, Virtual Address = 0x%lx\n", pid, virtual_addr);
+    uintptr_t addr = (uintptr_t)virtual_addr;
+    fprintf(stderr, "Sending request: PID = %d, Virtual Address = 0x%lx\n", pid, addr);
+    // 创建结构体并发送
+    RequestData request = {pid, (void*)addr};
+    write(client_fd, &request, sizeof(RequestData));
+
+    uint64_t phys_addr;
+    // 从服务器接收物理地址
+    read(client_fd, &phys_addr, sizeof(uint64_t));
+
+    close(client_fd);
+    return phys_addr;
 }
 
 // 初始化函数
