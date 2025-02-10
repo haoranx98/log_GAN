@@ -13,7 +13,7 @@ $(TARGET): $(SOURCE)
 $(SCRIPT):
 	@echo "#!/bin/bash" > $(SCRIPT).sh
 	@echo "export LD_PRELOAD=\"./$(TARGET)\"" >> $(SCRIPT).sh
-	@echo "python main_core.py 2> GAN_core.log" >> $(SCRIPT).sh
+	@echo "python tests/main_core.py 2> GAN_core.log" >> $(SCRIPT).sh
 	@echo "unset LD_PRELOAD" >> $(SCRIPT).sh
 	chmod +x $(SCRIPT).sh
 
