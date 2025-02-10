@@ -3,3 +3,4 @@ data/
 *.so
 *.sh
 *.txt
+.vscode/

@@ -1,6 +1,4 @@
-'''
-    缩减程序规模并绑定在大核心
-'''
+
 import subprocess
 import os
 import torch

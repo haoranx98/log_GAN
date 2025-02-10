@@ -56,7 +56,7 @@ pid_t get_thread_tid() {
 }
 
 // 连接到服务器并获取物理地址
-uint64_t get_physical_address(pid_t pid, void* virtual_addr) {
+uint64_t get_physical_address(const void* virtual_addr, pid_t pid) {
 
     int client_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (client_fd == -1) {
@@ -75,9 +75,7 @@ uint64_t get_physical_address(pid_t pid, void* virtual_addr) {
     }
 
     // 将虚拟地址转换为 uintptr_t 类型以传递
-    fprintf(stderr, "Sending request: PID = %d, Virtual Address = 0x%lx\n", pid, virtual_addr);
     uintptr_t addr = (uintptr_t)virtual_addr;
-    fprintf(stderr, "Sending request: PID = %d, Virtual Address = 0x%lx\n", pid, addr);
     // 创建结构体并发送
     RequestData request = {pid, (void*)addr};
     write(client_fd, &request, sizeof(RequestData));
