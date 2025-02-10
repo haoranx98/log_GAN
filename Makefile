@@ -1,8 +1,8 @@
 CC=gcc
 CFLAGS=-shared -fPIC
 LIBS=-ldl
-TARGET=mmap_logger_multi_write_with_tid.so
-SOURCE=mmap_logger_multi_write_with_tid.c
+TARGET=mmap_logger_multi.so
+SOURCE=mmap_logger_multi.c
 SCRIPT=run_python
 
 all: $(TARGET) $(SCRIPT)
