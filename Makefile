@@ -9,8 +9,10 @@ SERVER_SRC=src/server.c
 LOG_DIR=log
 BUILD_DIR=build
 BIN_DIR=bin
+TEST_DIR=src/tests
+BIN_TEST_DIR=bin/tests
 
-# 默认目标：编译共享库、脚本和server
+# 默认目标：编译共享库、脚本、server
 all: $(TARGET) $(SCRIPT) $(SERVER)
 
 # 编译共享库
@@ -44,7 +46,15 @@ clean:
 	rm -f $(SCRIPT).sh
 	rm -f $(BIN_DIR)/$(SERVER)
 	rm -f $(BUILD_DIR)/*.o
+	rm -f $(BIN_TEST_DIR)/test_*
 
 # 运行脚本
 run: $(SCRIPT)
 	./$(SCRIPT).sh
+
+# 编译src/tests下的所有C文件并生成对应的可执行文件
+test: $(patsubst src/tests/%.c,$(BIN_TEST_DIR)/test_%, $(wildcard $(TEST_DIR)/*.c))
+
+$(BIN_TEST_DIR)/test_%: $(TEST_DIR)/%.c
+	@mkdir -p $(BIN_DIR)
+	$(CC) -o $@ $<
