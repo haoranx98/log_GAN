@@ -1,8 +1,7 @@
 .vscode/
+/bin/*
+/build/*
+/lib/*
+/log/*
 data/
-*.log
-*.png
-*.sh
-*.so
-*.txt
 
