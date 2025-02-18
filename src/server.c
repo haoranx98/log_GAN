@@ -28,7 +28,7 @@ uint64_t get_physical_address(pid_t pid, void* virtual_addr) {
     }
 
     uintptr_t addr_num = (uintptr_t)virtual_addr;
-    printf("Virtual Address Number: %lu\n", addr_num);
+    // printf("Virtual Address Number: %lu\n", addr_num);
 
     // 计算虚拟地址所在页面的偏移
     off_t page_offset = (addr_num / getpagesize()) * sizeof(uint64_t); 
@@ -87,7 +87,7 @@ void handle_request(int client_fd) {
     pid_t pid = request.pid;
     void* virtual_addr = request.virtual_addr;
 
-    printf("Received request: PID = %d, Virtual Address = 0x%lx\n", pid, (uintptr_t)virtual_addr);
+    // printf("Received request: PID = %d, Virtual Address = 0x%lx\n", pid, (uintptr_t)virtual_addr);
 
     // 查询物理地址
     uint64_t phys_addr = get_physical_address(pid, virtual_addr);
@@ -98,7 +98,7 @@ void handle_request(int client_fd) {
         perror("Failed to send physical address");
     }
 
-    printf("Returned Physical Address: 0x%lx\n", phys_addr);
+    // printf("Returned Physical Address: 0x%lx\n", phys_addr);
 }
 
 int main() {

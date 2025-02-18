@@ -8,7 +8,7 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, Subset
 import matplotlib.pyplot as plt
-import psutil
+# import psutil
 
 # 限制 PyTorch 只使用 8 个线程
 # torch.set_num_threads(8)
@@ -26,18 +26,23 @@ torch.manual_seed(42)
 
 # 设备配置
 device = torch.device("cpu")
-
+print("使用 CPU 运行代码...")
 # MNIST数据集转换
 transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,))  # 归一化到[-1, 1]
 ])
 
+print("正在加载 MNIST 数据集...")
+
 # 加载完整数据集
 full_train_dataset = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transform)
 full_test_dataset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)
 
-# 只使用前 6000 张训练图片和前 1000 张测试图片
+print("MNIST 数据集加载完成！")
+
+print("正在创建 DataLoader...")
+# 只使用前 30 张训练图片和前 10 张测试图片
 train_dataset = Subset(full_train_dataset, range(30))
 test_dataset = Subset(full_test_dataset, range(10))
 
@@ -45,6 +50,7 @@ test_dataset = Subset(full_test_dataset, range(10))
 train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=10, shuffle=False)
 
+print("DataLoader 创建完成！")
 print(f"训练集大小: {len(train_dataset)} 张图片")
 print(f"测试集大小: {len(test_dataset)} 张图片")
 
