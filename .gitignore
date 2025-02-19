@@ -1,7 +1,7 @@
 .vscode/
 /bin/*
 /build/*
-/lib/*
+/libs/*
 /log/*
 data/
 *.png
