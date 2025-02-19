@@ -1,8 +1,8 @@
 CC=gcc
 CFLAGS=-shared -fPIC
 LIBS=-ldl
-TARGET=mmap_logger_multi.so
-SOURCE=src/mmap_logger_multi.c
+TARGET=mmap_logger_single_thread_vir.so
+SOURCE=src/mmap_logger_single_thread_vir.c
 SCRIPT=run_python
 SERVER=server
 SERVER_SRC=src/server.c
