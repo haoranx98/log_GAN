@@ -264,7 +264,7 @@ void* memmove(void* dest, const void* src, size_t n) {
     struct timespec end_time;
     clock_gettime(CLOCK_MONOTONIC, &end_time);
 
-    log_message("Process PID: %d, Thread TID: %d, Operation: memmove, from: %p to: %p,physical address from %p to %p, size: %zu bytes, start time: %ld.%09ld, end time: %ld.%09ld, duration: %ld ns\n",
+    log_message("Process PID: %d, Thread TID: %d, Operation: memmove, from: %p to: %p, physical address from %p to %p, size: %zu bytes, start time: %ld.%09ld, end time: %ld.%09ld, duration: %ld ns\n",
                 pid, tid, src, dest, paddr1, paddr2, n, start_time.tv_sec, start_time.tv_nsec, end_time.tv_sec, end_time.tv_nsec, end_time_ns - start_time_ns);
     return result;
 }
