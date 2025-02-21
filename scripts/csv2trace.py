@@ -3,7 +3,7 @@ import sys
 
 # 处理不同类型的函数
 def handle_mmap(row):
-    print(row)
+    
     return [f"Processed mmap: {row}"]
 
 def handle_munmap(row):
@@ -22,16 +22,101 @@ def handle_realloc(row):
     return [f"Processed realloc: {row}"]
 
 def handle_memset(row):
-    return [f"Processed memset: {row}"]
+    print(row)
+    address = int(row[1], 16)
+    length = int(row[3])
+    line = []
+
+    if(length <= 8):
+        for i in range(length):
+            address += 1
+            line.append(f"store 0x{address:016X}\n")
+    else:
+        num = length // 8
+
+        for i in range(num):
+            address += 8
+            line.append(f"store 0x{address:016X}\n")
+
+        if length % 8 != 0:
+            num = length % 8
+
+        for i in range(num):
+            address += 1
+            line.append(f"store 0x{address:016X}\n")
+
+    return line
 
 def handle_memcmp(row):
-    return [f"Processed memcmp: {row}"]
+    print(row)
+    src = int(row[1], 16)
+    dst = int(row[2], 16)
+    length = int(row[3])
+    line = []
 
+    length_16 = length // 16
+    length_8 = length % 16 // 8
+    length_4 = length % 8 // 4
+    length_1 = length % 4
+
+    for i in range(length_16):
+        for i in range(2):
+            src += 8
+            dst += 8
+            line.append(f"load 0x{src:016X}\n")
+            line.append(f"load 0x{dst:016X}\n")
+    
+    for i in range(length_8):
+        src += 8
+        dst += 8
+        line.append(f"load 0x{src:016X}\n")
+        line.append(f"load 0x{dst:016X}\n")
+    
+    for i in range(length_4):
+        src += 4
+        dst += 4
+        line.append(f"load 0x{src:016X}\n") 
+        line.append(f"load 0x{dst:016X}\n")
+    
+    for i in range(length_1):
+        src += 1
+        dst += 1
+        line.append(f"load 0x{src:016X}\n")
+        line.append(f"load 0x{dst:016X}\n")
+
+    return line
 def handle_memmove(row):
-    return [f"Processed memmove: {row}"]
+    print(row)
+    src = int(row[1], 16)
+    dst = int(row[2], 16)
+    length = int(row[3])
+    line = []
 
-def handle_memcpy(row):
-    return [f"Processed memcpy: {row}"]
+    if length <= 8:
+        for i in range(length):
+            src += 1
+            dst += 1
+            line.append(f"load 0x{src:016X}\n")
+            line.append(f"store 0x{dst:016X}\n")
+    else:
+        num = length // 8
+
+        for i in range(num):
+            src += 8
+            dst += 8
+            line.append(f"load 0x{src:016X}\n")
+            line.append(f"store 0x{dst:016X}\n")
+
+        if length % 8 != 0:
+            num = length % 8
+
+        for i in range(num):
+            src += 1
+            dst += 1
+            line.append(f"load 0x{src:016X}\n")
+            line.append(f"store 0x{dst:016X}\n")
+    return line
+
 
 # 根据类型选择对应的处理函数
 def process_row(row):
@@ -55,7 +140,7 @@ def process_row(row):
     elif operation_type == 'memmove':
         return handle_memmove(row)
     elif operation_type == 'memcpy':
-        return handle_memcpy(row)
+        return handle_memmove(row)
     else:
         return [f"Unknown operation type: {operation_type}"]
 
