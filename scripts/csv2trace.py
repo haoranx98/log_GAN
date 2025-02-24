@@ -27,23 +27,31 @@ def handle_memset(row):
     length = int(row[3])
     line = []
 
+    ops = 0
+    if(length <= 8):
+        ops += length
+    else:
+        ops = length // 8 + length % 8
+
+    time = int(row[4]) // ops
+
     if(length <= 8):
         for i in range(length):
             address += 1
-            line.append(f"store 0x{address:016X}\n")
+            line.append(f"WRITE 0x{address:010X} {time}\n")
     else:
         num = length // 8
 
         for i in range(num):
             address += 8
-            line.append(f"store 0x{address:016X}\n")
+            line.append(f"WRITE 0x{address:010X} {time}\n")
 
         if length % 8 != 0:
             num = length % 8
 
-        for i in range(num):
-            address += 1
-            line.append(f"store 0x{address:016X}\n")
+            for i in range(num):
+                address += 1
+                line.append(f"WRITE 0x{address:010X} {time}\n")
 
     return line
 
@@ -53,36 +61,44 @@ def handle_memcmp(row):
     dst = int(row[2], 16)
     length = int(row[3])
     line = []
+    ops = 0
 
     length_16 = length // 16
+    ops += length_16 * 4
     length_8 = length % 16 // 8
+    ops += length_8 * 2
     length_4 = length % 8 // 4
+    ops += length_4 * 2
     length_1 = length % 4
+    ops += length_1
+
+    time = int(row[4]) // ops
+
 
     for i in range(length_16):
         for i in range(2):
             src += 8
             dst += 8
-            line.append(f"load 0x{src:016X}\n")
-            line.append(f"load 0x{dst:016X}\n")
+            line.append(f"READ 0x{src:010X} {time}\n")
+            line.append(f"READ 0x{dst:010X} {time}\n")
     
     for i in range(length_8):
         src += 8
         dst += 8
-        line.append(f"load 0x{src:016X}\n")
-        line.append(f"load 0x{dst:016X}\n")
+        line.append(f"READ 0x{src:010X} {time}\n")
+        line.append(f"READ 0x{dst:010X} {time}\n")
     
     for i in range(length_4):
         src += 4
         dst += 4
-        line.append(f"load 0x{src:016X}\n") 
-        line.append(f"load 0x{dst:016X}\n")
+        line.append(f"READ 0x{src:010X} {time}\n") 
+        line.append(f"READ 0x{dst:010X} {time}\n")
     
     for i in range(length_1):
         src += 1
         dst += 1
-        line.append(f"load 0x{src:016X}\n")
-        line.append(f"load 0x{dst:016X}\n")
+        line.append(f"READ 0x{src:010X} {time}\n")
+        line.append(f"READ 0x{dst:010X} {time}\n")
 
     return line
 def handle_memmove(row):
@@ -91,30 +107,34 @@ def handle_memmove(row):
     dst = int(row[2], 16)
     length = int(row[3])
     line = []
+    ops = 0
 
     if length <= 8:
+        time = int(row[4]) // length
         for i in range(length):
             src += 1
             dst += 1
-            line.append(f"load 0x{src:016X}\n")
-            line.append(f"store 0x{dst:016X}\n")
+            line.append(f"READ 0x{src:010X} {time}\n")
+            line.append(f"WRITE 0x{dst:010X} {time}\n")
     else:
         num = length // 8
+        ops = num + length % 8
+        time = int(row[4]) // ops
 
         for i in range(num):
             src += 8
             dst += 8
-            line.append(f"load 0x{src:016X}\n")
-            line.append(f"store 0x{dst:016X}\n")
+            line.append(f"READ 0x{src:010X} {time}\n")
+            line.append(f"WRITE 0x{dst:010X} {time}\n")
 
         if length % 8 != 0:
             num = length % 8
 
-        for i in range(num):
-            src += 1
-            dst += 1
-            line.append(f"load 0x{src:016X}\n")
-            line.append(f"store 0x{dst:016X}\n")
+            for i in range(num):
+                src += 1
+                dst += 1
+                line.append(f"READ 0x{src:010X} {time}\n")
+                line.append(f"WRITE 0x{dst:010X} {time}\n")
     return line
 
 
@@ -122,17 +142,23 @@ def handle_memmove(row):
 def process_row(row):
     operation_type = row[0]
     if operation_type == 'mmap':
-        return handle_mmap(row)
+        # return handle_mmap(row)
+        return []
     elif operation_type == 'munmap':
-        return handle_munmap(row)
+        # return handle_munmap(row)
+        return []
     elif operation_type == 'malloc':
-        return handle_malloc(row)
+        # return handle_malloc(row)
+        return []
     elif operation_type == 'free':
-        return handle_free(row)
+        # return handle_free(row)
+        return []
     elif operation_type == 'calloc':
-        return handle_calloc(row)
+        # return handle_calloc(row)
+        return []
     elif operation_type == 'realloc':
-        return handle_realloc(row)
+        # return handle_realloc(row)
+        return []
     elif operation_type == 'memset':
         return handle_memset(row)
     elif operation_type == 'memcmp':
@@ -152,10 +178,11 @@ def parse_csv(input_file, output_file):
             reader = csv.reader(infile)
             # 打开输出文件进行写入
             with open(output_file, mode='w', newline='') as outfile:
-                writer = csv.writer(outfile)
+                # writer = csv.writer(outfile)
                 for row in reader:
                     processed_row = process_row(row)
-                    writer.writerow(processed_row)
+                    for line in processed_row:
+                        outfile.write(line)
         print(f"Processing completed. Results written to {output_file}")
     except FileNotFoundError:
         print(f"Error: The file {input_file} was not found.")
