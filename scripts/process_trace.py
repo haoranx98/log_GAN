@@ -11,8 +11,8 @@ def process_line(line, start_time):
         # 计算当前行的开始时间
         start_time += operation_time
         
-        # 除以0.769并取整
-        start_time = int(start_time / 0.769)
+        # 除以0.75并取整
+        start_time = int(start_time / 0.75)
         
         # 返回格式化的字符串，包含开始时间和其他字段
         return f"{address} {operation} {start_time}\n", start_time

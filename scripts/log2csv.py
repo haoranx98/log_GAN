@@ -70,7 +70,7 @@ def handle_realloc(line):
 
 def handle_memset(line):
     parts = line.split(", ")
-    print(parts)
+    # print(parts)
     operation = parts[2].split(": ")[1]
     physical_address = parts[4].split(": ")[1]
     value = parts[5].split(": ")[1].split()[0]
