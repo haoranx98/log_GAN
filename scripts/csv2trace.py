@@ -30,7 +30,7 @@ def handle_memset(row):
 
     ops = 0
 
-    if(length != 0):
+    if(length > 0 and length <= 80):
         # print(length)
         if(length <= 8):
             ops += length
@@ -59,7 +59,7 @@ def handle_memset(row):
                     address += 1
                     line.append(f"WRITE 0x{address:010X} {time}\n")
     else:
-        print("length is 0")
+        print("memset length is 0")
 
     return line
 
@@ -71,7 +71,7 @@ def handle_memcmp(row):
     line = []
     ops = 0
 
-    if(length != 0):
+    if(length > 0 and length <= 12):
         length_16 = length // 16
         ops += length_16 * 4
         length_8 = length % 16 // 8
@@ -108,6 +108,8 @@ def handle_memcmp(row):
             dst += 1
             line.append(f"READ 0x{src:010X} {time}\n")
             line.append(f"READ 0x{dst:010X} {time}\n")
+    else:
+        print("memcmp length is 0")
 
     return line
 def handle_memmove(row):
@@ -118,7 +120,7 @@ def handle_memmove(row):
     line = []
     ops = 0
 
-    if(length != 0):
+    if(length > 0 and length <= 36):
         if length <= 8:
             time = int(row[4]) // length
             for i in range(length):
@@ -145,6 +147,8 @@ def handle_memmove(row):
                     dst += 1
                     line.append(f"READ 0x{src:010X} {time}\n")
                     line.append(f"WRITE 0x{dst:010X} {time}\n")
+    else:
+        print("memmove length is 0")
     return line
 
 

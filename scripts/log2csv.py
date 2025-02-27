@@ -21,6 +21,8 @@ def handle_memcpy(line):
 
     # 提取所需信息
     operation = parts[2].split(':')[1].strip()
+    # print(operation)
+    operation = "memmove"
     from_address = parts[3].split(' ')[1].strip()
     to_address = parts[3].split(' ')[3].strip()
     physical_from_address = parts[4].split(' ')[3].strip()
@@ -28,6 +30,7 @@ def handle_memcpy(line):
     size = parts[5].split(' ')[1].strip()
     duration = parts[8].split(' ')[1].strip()
 
+    # print(f"{operation}, {physical_from_address}, {physical_to_address}, {size}, {duration}")
     return f"{operation}, {physical_from_address}, {physical_to_address}, {size}, {duration}"
 
 
