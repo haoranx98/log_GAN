@@ -3,22 +3,85 @@ import sys
 
 # 处理不同类型的函数
 def handle_mmap(row):
+
+    address = int(row[1], 16)
+    line = []
+    time = int(row[3])
+
+    line.append(f"WRITE 0x{address:010X} {time}\n")
+
+    for i in range(2):
+        line.append(f"WRITE 0x{address:010X} 28\n")
+
     
-    return [f"Processed mmap: {row}"]
+    return line
 
 def handle_munmap(row):
-    return [f"Processed munmap: {row}"]
+    address = int(row[1], 16)
+    line = []
+    time = int(row[3])
+
+    line.append(f"WRITE 0x{address:010X} {time}\n")
+
+    for i in range(2):
+        line.append(f"WRITE 0x{address:010X} 28\n")
+
+    
+    return line
 
 def handle_malloc(row):
-    return [f"Processed malloc: {row}"]
 
-def handle_free(row):
-    return [f"Processed free: {row}"]
+    address = int(row[1], 16)
+    length = int(row[2])
+    line = []
+    time = int(row[3]) // 14
+
+    for i in range(10):
+        line.append(f"READ 0x{address:010X} {time}\n")
+    for i in range(4):
+        line.append(f"WRITE 0x{address:010X} {time}\n")
+
+    return line
 
 def handle_calloc(row):
-    return [f"Processed calloc: {row}"]
+    address = int(row[1], 16)
+    size = int(row[3])
+    line = []
+
+    ops = 0
+
+    ops = size // 8 + size % 8
+
+
+    time = int(row[4]) // (ops + 14)
+
+    for i in range(10):
+        line.append(f"READ 0x{address:010X} {time}\n")
+    for i in range(4):
+        line.append(f"WRITE 0x{address:010X} {time}\n")
+
+    for i in range(ops):
+        address += 8
+        line.append(f"WRITE 0x{address:010X} {time}\n")
+
+    return line
+
+
+def handle_free(row):
+
+    address = int(row[1], 16)
+    line = []
+    time = int(row[3]) // 10
+
+    for i in range(7):
+        line.append(f"READ 0x{address:010X} {time}\n")
+    for i in range(3):
+        line.append(f"WRITE 0x{address:010X} {time}\n")
+    
+    return line
 
 def handle_realloc(row):
+    
     return [f"Processed realloc: {row}"]
 
 def handle_memset(row):
@@ -162,11 +225,11 @@ def process_row(row):
         # return handle_munmap(row)
         return []
     elif operation_type == 'malloc':
-        # return handle_malloc(row)
-        return []
+        return handle_malloc(row)
+        # return []
     elif operation_type == 'free':
-        # return handle_free(row)
-        return []
+        return handle_free(row)
+        # return []
     elif operation_type == 'calloc':
         # return handle_calloc(row)
         return []
