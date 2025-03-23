@@ -35,7 +35,7 @@ def bfs_shortest_path(maze, start, end):
 
 # 主程序
 if __name__ == '__main__':
-    size = 10000
+    size = 100
     start = (0, 0)
     end = (size - 1, size - 1)
 

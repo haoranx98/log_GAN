@@ -18,7 +18,7 @@ def solve_n_queens(n):
     return len(solutions)
 
 import time
-n = 12
+n = 8
 start = time.time()
 count = solve_n_queens(n)
 end = time.time()
