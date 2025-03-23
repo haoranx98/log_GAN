@@ -219,11 +219,11 @@ def handle_memmove(row):
 def process_row(row):
     operation_type = row[0]
     if operation_type == 'mmap':
-        # return handle_mmap(row)
-        return []
+        return handle_mmap(row)
+        # return []
     elif operation_type == 'munmap':
-        # return handle_munmap(row)
-        return []
+        return handle_munmap(row)
+        # return []
     elif operation_type == 'malloc':
         return handle_malloc(row)
         # return []
@@ -231,8 +231,8 @@ def process_row(row):
         return handle_free(row)
         # return []
     elif operation_type == 'calloc':
-        # return handle_calloc(row)
-        return []
+        return handle_calloc(row)
+        # return []
     elif operation_type == 'realloc':
         # return handle_realloc(row)
         return []
