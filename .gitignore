@@ -1,11 +1,11 @@
 .vscode/
-/bin/*
-/build/*
-/libs/*
-/log/*
+# /bin/*
+# /build/*
+# /libs/*
+# /log/*
 data/
 *.png
 *.sh
-csv/*
-trace/*
+# csv/*
+# trace/*
 
